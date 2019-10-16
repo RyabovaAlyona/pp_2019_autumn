@@ -1,4 +1,5 @@
 // Copyright 2019 Ryabova Alyona
+
 #include <mpi.h>
 #include <string>
 #include <random>
