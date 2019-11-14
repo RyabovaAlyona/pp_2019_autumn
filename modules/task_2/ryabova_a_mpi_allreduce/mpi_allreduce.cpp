@@ -2,6 +2,7 @@
 
 #include <mpi.h>
 #include <algorithm>
+#include <cstring>
 #include <iostream>
 #include "../../../modules/task_2/ryabova_a_mpi_allreduce/mpi_allreduce.h"
 
@@ -40,11 +41,10 @@ int MPI_Allreduce_c(void* sendbuf, void* recvbuf, int count,
         return MPI_SUCCESS;
     }
 
-    bool odd = 0; // флаг нечетного количества
+    bool odd = 0;
     if (size % 2 == 1)
         odd = 1;
     int localsize = size;
-    int k = 0;
 
     while (localsize != 1) {
         for (int i = 0; i < localsize / 2; i++)
@@ -53,100 +53,74 @@ int MPI_Allreduce_c(void* sendbuf, void* recvbuf, int count,
         for (int i = 0; i < localsize / 2; i++)
             if (rank == i) {
                 MPI_Status status;
-                switch (datatype) {
-                case MPI_INT:
+                if (datatype == MPI_INT)
                     MPI_Recv(getbufInt, count, datatype, localsize - i - 1, i, comm, &status);
-                    break;
-                case MPI_FLOAT:
+                if (datatype == MPI_FLOAT)
                     MPI_Recv(getbufFloat, count, datatype, localsize - i - 1, i, comm, &status);
-                    break;
-                case MPI_DOUBLE:
+                if (datatype == MPI_DOUBLE)
                     MPI_Recv(getbufDouble, count, datatype, localsize - i - 1, i, comm, &status);
-                    break;
-                }
-                switch (op) {
-                case MPI_MAX:
-                    switch (datatype) {
-                    case MPI_INT:
+                if (op == MPI_MAX) {
+                    if (datatype == MPI_INT) {
                         for (int j = 0; j < count; j++) {
                             if (static_cast<int*>(recvbuf)[j] < getbufInt[j])
                                 static_cast<int*>(recvbuf)[j] = getbufInt[j];
                         }
-                        break;
-                    case MPI_FLOAT:
+                    } else if (datatype == MPI_FLOAT) {
                         for (int j = 0; j < count; j++) {
                             if (static_cast<float*>(recvbuf)[j] < getbufFloat[j])
                                 static_cast<float*>(recvbuf)[j] = getbufFloat[j];
                         }
-                        break;
-                    case MPI_DOUBLE:
+                    } else if (datatype == MPI_DOUBLE) {
                         for (int j = 0; j < count; j++) {
                             if (static_cast<double*>(recvbuf)[j] < getbufDouble[j])
                                 static_cast<double*>(recvbuf)[j] = getbufDouble[j];
                         }
-                        break;
                     }
-                break;
-                case MPI_MIN:
-                    switch (datatype) {
-                    case MPI_INT:
+                } else if (op == MPI_MIN) {
+                    if (datatype == MPI_INT) {
                         for (int j = 0; j < count; j++) {
                             if (static_cast<int*>(recvbuf)[j] > getbufInt[j])
                                 static_cast<int*>(recvbuf)[j] = getbufInt[j];
                         }
-                    break;
-                    case MPI_FLOAT:
+                    } else if (datatype == MPI_FLOAT) {
                         for (int j = 0; j < count; j++) {
                             if (static_cast<float*>(recvbuf)[j] > getbufFloat[j])
                                 static_cast<float*>(recvbuf)[j] = getbufFloat[j];
                         }
-                    break;
-                    case MPI_DOUBLE:
+                    } else if (datatype == MPI_DOUBLE) {
                         for (int j = 0; j < count; j++) {
                             if (static_cast<double*>(recvbuf)[j] > getbufDouble[j])
                                 static_cast<double*>(recvbuf)[j] = getbufDouble[j];
                         }
-                    break;
                     }
-                break;
-                case MPI_SUM:
-                    switch (datatype) {
-                    case MPI_INT:
+                } else if (op == MPI_SUM) {
+                    if (datatype == MPI_INT) {
                         for (int j = 0; j < count; j++) {
                             static_cast<int*>(recvbuf)[j] += getbufInt[j];
                         }
-                    break;
-                    case MPI_FLOAT:
+                    } else if (datatype == MPI_FLOAT) {
                         for (int j = 0; j < count; j++) {
                             static_cast<float*>(recvbuf)[j] += getbufFloat[j];
                         }
-                    break;
-                    case MPI_DOUBLE:
+                    } else if (datatype == MPI_DOUBLE) {
                         for (int j = 0; j < count; j++) {
                             static_cast<double*>(recvbuf)[j] += getbufDouble[j];
                         }
-                    break;
                     }
-                break;
-                case MPI_PROD:
-                    switch (datatype) {
-                    case MPI_INT:
+                } else if (op == MPI_PROD) {
+                    if (datatype == MPI_INT) {
                         for (int j = 0; j < count; j++) {
                             static_cast<int*>(recvbuf)[j] *= getbufInt[j];
                         }
-                    break;
-                    case MPI_FLOAT:
+                    } else if (datatype == MPI_FLOAT) {
                         for (int j = 0; j < count; j++) {
                             static_cast<float*>(recvbuf)[j] *= getbufFloat[j];
                         }
-                    break;
-                    case MPI_DOUBLE:
+                    } else if (datatype == MPI_DOUBLE) {
                         for (int j = 0; j < count; j++) {
                             static_cast<double*>(recvbuf)[j] *= getbufDouble[j];
                         }
-                    break;
                     }
-                break;
                 }
             }
         if (localsize % 2 == 1)
@@ -158,36 +132,34 @@ int MPI_Allreduce_c(void* sendbuf, void* recvbuf, int count,
             localsize++;
     }
 
-    if (rank == 0)
+    if (rank == 0) {
         for (int i = 1; i < size; i++) {
             MPI_Send(recvbuf, count, datatype, i, i, comm);
-        } else
-        switch (datatype) {
-        case MPI_INT:
-            for (int i = 1; i < size; i++) {
-                if (rank == i) {
-                    MPI_Status status;
-                    MPI_Recv(recvbuf, count, datatype, 0, i, comm, &status);
-                }
-            }
-        break;
-        case MPI_FLOAT:
-            for (int i = 1; i < size; i++) {
-                if (rank == i) {
-                    MPI_Status status;
-                    MPI_Recv(recvbuf, count, datatype, 0, i, comm, &status);
-                }
-            }
-        break;
-        case MPI_DOUBLE:
-            for (int i = 1; i < size; i++) {
-                if (rank == i) {
-                    MPI_Status status;
-                    MPI_Recv(recvbuf, count, datatype, 0, i, comm, &status);
-                }
-            }
-        break;
         }
+    } else {
+        if (datatype == MPI_INT) {
+            for (int i = 1; i < size; i++) {
+                if (rank == i) {
+                    MPI_Status status;
+                    MPI_Recv(recvbuf, count, datatype, 0, i, comm, &status);
+                }
+            }
+        } else if (datatype == MPI_FLOAT) {
+            for (int i = 1; i < size; i++) {
+                if (rank == i) {
+                    MPI_Status status;
+                    MPI_Recv(recvbuf, count, datatype, 0, i, comm, &status);
+                }
+            }
+        } else if (datatype == MPI_DOUBLE) {
+            for (int i = 1; i < size; i++) {
+                if (rank == i) {
+                    MPI_Status status;
+                    MPI_Recv(recvbuf, count, datatype, 0, i, comm, &status);
+                }
+            }
+        }
+    }
 
     return MPI_SUCCESS;
 }

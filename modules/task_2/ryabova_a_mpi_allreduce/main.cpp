@@ -12,13 +12,11 @@ TEST(mpi_allreduce, return_MPI_ERR_COUNT) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     int senbuf = 0;
     int recvbuf = 0;
-    int sum = 0;
 
     ASSERT_EQ(MPI_Allreduce_c(&senbuf, &recvbuf, -1, MPI_INT, MPI_SUM, MPI_COMM_WORLD), MPI_ERR_COUNT);
 }
 
 TEST(mpi_allreduce, return_MPI_ERR_TYPE) {
-
     // Arrange
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -30,7 +28,6 @@ TEST(mpi_allreduce, return_MPI_ERR_TYPE) {
 }
 
 TEST(mpi_allreduce, return_MPI_ERR_OP) {
-
     // Arrange
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -137,16 +134,17 @@ TEST(mpi_allreduce, correctly_calculate_sum_for_int_array) {
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    int * senbuf = new int [5];
+    int * senbuf = new int[5];
     int * recvbuf = new int[5];
     int sum = 0;
 
     // Act
     for (int i = 0; i < size; i++) {
-        if (rank == i) 
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = i + 1;
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_INT,
         MPI_SUM, MPI_COMM_WORLD);
@@ -169,10 +167,11 @@ TEST(mpi_allreduce, correctly_calculate_prod_for_int_array) {
 
     // Act
     for (int i = 0; i < size; i++) {
-        if (rank == i) 
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = i + 1;
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_INT,
         MPI_PROD, MPI_COMM_WORLD);
@@ -195,10 +194,11 @@ TEST(mpi_allreduce, correctly_calculate_max_for_int_array) {
 
     // Act
     for (int i = 0; i < size; i++) {
-        if (rank == i) 
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = i + 1;
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_INT,
         MPI_MAX, MPI_COMM_WORLD);
@@ -220,10 +220,11 @@ TEST(mpi_allreduce, correctly_calculate_min_for_int_array) {
     // Act
 
     for (int i = 0; i < size; i++) {
-        if (rank == i) 
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = i + 1;
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_INT,
         MPI_MIN, MPI_COMM_WORLD);
@@ -297,7 +298,7 @@ TEST(mpi_allreduce, correctly_calculate_min_for_float) {
     // Arrange
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
     float senbuf = 0.0f;
     float recvbuf = 0.0f;
     float min = 0.1f;
@@ -325,10 +326,11 @@ TEST(mpi_allreduce, correctly_calculate_sum_for_float_array) {
 
     // Act
     for (int i = 0; i < size; i++) {
-        if (rank == i)
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = 1.0f;
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_FLOAT,
         MPI_SUM, MPI_COMM_WORLD);
@@ -349,10 +351,11 @@ TEST(mpi_allreduce, correctly_calculate_prod_for_float_array) {
 
     // Act
     for (int i = 0; i < size; i++) {
-        if (rank == i)
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = 2.0f;
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_FLOAT,
         MPI_PROD, MPI_COMM_WORLD);
@@ -376,10 +379,11 @@ TEST(mpi_allreduce, correctly_calculate_max_for_float_array) {
 
     // Act
     for (int i = 0; i < size; i++) {
-        if (rank == i)
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = static_cast <float>(i);
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_FLOAT,
         MPI_MAX, MPI_COMM_WORLD);
@@ -400,10 +404,11 @@ TEST(mpi_allreduce, correctly_calculate_min_for_float_array) {
 
     // Act
     for (int i = 0; i < size; i++) {
-        if (rank == i)
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = static_cast <float>(i) + 1.0f;
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_FLOAT,
         MPI_MIN, MPI_COMM_WORLD);
@@ -512,10 +517,11 @@ TEST(mpi_allreduce, correctly_calculate_sum_for_double_array) {
     // Act
 
     for (int i = 0; i < size; i++) {
-        if (rank == i)
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = 1.0;
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_DOUBLE,
         MPI_SUM, MPI_COMM_WORLD);
@@ -536,10 +542,11 @@ TEST(mpi_allreduce, correctly_calculate_prod_for_double_array) {
 
     // Act
     for (int i = 0; i < size; i++) {
-        if (rank == i)
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = 2.0;
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_DOUBLE,
         MPI_PROD, MPI_COMM_WORLD);
@@ -562,10 +569,11 @@ TEST(mpi_allreduce, correctly_calculate_max_for_double_array) {
 
     // Act
     for (int i = 0; i < size; i++) {
-        if (rank == i)
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = static_cast <double>(i);
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_DOUBLE,
         MPI_MAX, MPI_COMM_WORLD);
@@ -586,10 +594,11 @@ TEST(mpi_allreduce, correctly_calculate_min_for_double_array) {
 
     // Act
     for (int i = 0; i < size; i++) {
-        if (rank == i)
+        if (rank == i) {
             for (int j = 0; j < 5; j++) {
                 senbuf[j] = static_cast <double>(i) + 1.0;
             }
+        }
     }
     MPI_Allreduce_c(senbuf, recvbuf, 5, MPI_DOUBLE,
         MPI_MIN, MPI_COMM_WORLD);
