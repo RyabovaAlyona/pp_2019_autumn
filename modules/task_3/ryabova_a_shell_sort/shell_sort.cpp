@@ -3,10 +3,10 @@
 #include <mpi.h>
 #include <algorithm>
 #include <iostream>
+#include <vector>
 #include "../../../modules/task_3/ryabova_a_shell_sort/shell_sort.h"
 
 std::vector<int> compare(std::vector<int> array) {
-
     int sizeArray = array.size();
     int k;
     for (int i = 1; i < sizeArray; i++) {
@@ -41,7 +41,6 @@ std::vector<int> shell_sort(std::vector<int> array) {
     int n = 0, countProcNum = 0;
 
     while (op != 0) {
-
         op = op / 2;
         countOp = op / (ProcNum - 1);
         countProc = op % (ProcNum - 1);
@@ -63,8 +62,7 @@ std::vector<int> shell_sort(std::vector<int> array) {
                         localArray.push_back(array[proc + countProcNum + op * i]);
                     }
                     MPI_Send(&localArray[0], sizeLocalArray, MPI_INT, proc + 1, n, MPI_COMM_WORLD);
-                }
-                else {
+                } else {
                     if (ProcRank == proc + 1) {
                         MPI_Status status;
                         MPI_Recv(&localArray[0], sizeLocalArray, MPI_INT, 0,

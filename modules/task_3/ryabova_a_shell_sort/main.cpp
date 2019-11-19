@@ -2,7 +2,7 @@
 #include <gtest-mpi-listener.hpp>
 #include <gtest/gtest.h>
 #include <algorithm>
-#include <string>
+#include <vector>
 #include "./shell_sort.h"
 
 TEST(shell_sort, sort_random_array) {
