@@ -33,8 +33,7 @@ std::vector<int> shell_sort(std::vector<int> array) {
 
     if (sizeArray < 2)
         return array;
-    if (ProcNum == 1)
-        return compare(array);
+
 
     int op = array.size();
     int sizeLocalArray, countOp, countProc, count, count2;
@@ -42,8 +41,8 @@ std::vector<int> shell_sort(std::vector<int> array) {
 
     while (op != 0) {
         op = op / 2;
-        countOp = op / (ProcNum - 1);
-        countProc = op % (ProcNum - 1);
+        countOp = op / ProcNum;
+        countProc = op % ProcNum;
         count = op < ProcNum ? op : ProcNum;
         count2 = countOp;
         if (countProc > 0)
@@ -51,28 +50,35 @@ std::vector<int> shell_sort(std::vector<int> array) {
         n = 0, countProcNum = 0;
         sizeLocalArray = sizeArray / op;
         std::vector<int> localArray(sizeLocalArray);
-
+        std::vector<int> localArrayForRoot(sizeLocalArray);
         do {
             if (countProcNum + countProc == op)
-                count = countProc + 1;
-            for (int proc = 0; proc < count - 1; proc++) {
+                count = countProc;
+            for (int proc = 0; proc < count; proc++) {
                 if (ProcRank == 0) {
                     localArray.clear();
                     for (int i = 0; i < sizeLocalArray; i++) {
                         localArray.push_back(array[proc + countProcNum + op * i]);
                     }
-                    MPI_Send(&localArray[0], sizeLocalArray, MPI_INT, proc + 1, n, MPI_COMM_WORLD);
+                    if (proc == 0) {
+                        localArray = compare(localArray);
+                        for (int i = 0; i < sizeLocalArray; i++) {
+                            array[countProcNum + op * i] = localArray[i];
+                        }
+                    } else {
+                        MPI_Send(&localArray[0], sizeLocalArray, MPI_INT, proc, n, MPI_COMM_WORLD);
+                    }
                 } else {
-                    if (ProcRank == proc + 1) {
+                    if (ProcRank == proc) {
                         MPI_Status status;
                         MPI_Recv(&localArray[0], sizeLocalArray, MPI_INT, 0,
                             n, MPI_COMM_WORLD, &status);
                         localArray = compare(localArray);
-                        MPI_Send(&localArray[0], sizeLocalArray, MPI_INT, 0, proc + 1 + n, MPI_COMM_WORLD);
+                        MPI_Send(&localArray[0], sizeLocalArray, MPI_INT, 0, proc + n, MPI_COMM_WORLD);
                     }
                 }
             }
-            countProcNum += ProcNum - 1;
+            countProcNum += ProcNum;
             n++;
         } while (countProcNum < op);
 
@@ -83,16 +89,16 @@ std::vector<int> shell_sort(std::vector<int> array) {
         if (ProcRank == 0) {
             do {
                 if (countProcNum + countProc == op)
-                    count = countProc + 1;
-                for (int proc = 0; proc < count - 1; proc++) {
+                    count = countProc;
+                for (int proc = 1; proc < count; proc++) {
                     MPI_Status status;
-                    MPI_Recv(&localArray[0], sizeLocalArray, MPI_INT, proc + 1,
-                        proc + 1 + n, MPI_COMM_WORLD, &status);
+                    MPI_Recv(&localArray[0], sizeLocalArray, MPI_INT, proc,
+                        proc + n, MPI_COMM_WORLD, &status);
                     for (int i = 0; i < sizeLocalArray; i++) {
                         array[proc + op * i + countProcNum] = localArray[i];
                     }
                 }
-                countProcNum = countProcNum + ProcNum - 1;
+                countProcNum = countProcNum + ProcNum;
                 n++;
             } while (countProcNum < op);
         }
