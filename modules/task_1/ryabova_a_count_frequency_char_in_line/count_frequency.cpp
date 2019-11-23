@@ -1,7 +1,9 @@
 // Copyright 2019 Ryabova Alyona
 
 #include <mpi.h>
+#include <cstring>
 #include <string>
+#include <ctime>
 #include <random>
 #include "../../../modules/task_1/ryabova_a_count_frequency_char_in_line/count_frequency.h"
 
@@ -11,7 +13,7 @@ std::string getRandomString(int size) {
         "0123456789"
         "QWERTYUIOPASDFGHJKLZXCVBNM"
         "qwertyuiopasdfghjklzxcvbnm";
-    int alphanumLen = strlen(alphanum);
+    int alphanumLen = std::strlen(alphanum);
     std::string str(size, 0);
     for (int i = 0; i < size; i++) {
         str[i] = alphanum[rand() % (alphanumLen - 1)];
