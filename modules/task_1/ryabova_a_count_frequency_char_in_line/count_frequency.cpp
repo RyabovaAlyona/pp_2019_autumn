@@ -11,7 +11,7 @@ std::string getRandomString(int size) {
         "0123456789"
         "QWERTYUIOPASDFGHJKLZXCVBNM"
         "qwertyuiopasdfghjklzxcvbnm";
-    int alphanumLen = std::strlen(alphanum);
+    int alphanumLen = strlen(alphanum);
     std::string str(size, 0);
     for (int i = 0; i < size; i++) {
         str[i] = alphanum[rand() % (alphanumLen - 1)];
